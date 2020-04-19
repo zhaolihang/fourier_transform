@@ -1,0 +1,88 @@
+傅里叶变换图解 https://baijiahao.baidu.com/s?id=1636833728798493906
+马同学傅里叶变换推导 https://www.matongxue.com/columns/6/
+
+简书 https://www.jianshu.com/p/d30230dcc443
+https://zhuanlan.zhihu.com/p/19763358?columnSlug=wille
+
+
+一维傅里叶变换例子 
+https://blog.csdn.net/qq_34917728/article/details/79751045
+
+
+一维傅里叶变换例子物理意义
+https://zhuanlan.zhihu.com/p/58770378
+
+
+二维(图像)傅里叶变换例子
+https://jingyan.baidu.com/article/3065b3b6b4467ebecff8a4ad.html
+https://www.cnblogs.com/kkyyhh96/p/6505473.html
+https://blog.csdn.net/weixin_43637490/article/details/89196212
+
+
+线性代数应用
+https://www.zhihu.com/question/36845076/answer/998543755
+
+三角变换
+https://www.zhihu.com/question/20829733
+
+复数物理意义
+https://www.zhihu.com/question/23234701/answer/26017000
+
+傅里叶分析之掐死教程（完整版）
+https://zhuanlan.zhihu.com/p/19763358
+
+理解1维傅里叶变换
+https://zhuanlan.zhihu.com/p/58770378
+
+我理解的傅里叶变换   向量的观点
+https://zhuanlan.zhihu.com/p/23739221
+
+交互式傅里叶 网站
+http://www.jezzamon.com/fourier/
+
+
+正交概念、级数展开在工程中的应用  
+https://www.zhihu.com/question/21665935/answer/358423678  Jason Huang的回答
+
+
+傅里叶变换手稿 
+https://www.zhihu.com/question/21665935  蓦子骞
+
+
+
+MATLAB帮助文档
+https://ww2.mathworks.cn/help/matlab/index.html
+
+MATLAB帮助文档fft
+https://ww2.mathworks.cn/help/matlab/ref/fft.html
+
+傅里叶展开可视化
+https://zhuanlan.zhihu.com/p/63634275
+
+离散傅里叶变换 c语言实现 
+https://blog.csdn.net/yga_airspace/article/details/86561371
+https://blog.csdn.net/mingzhuo_126/article/details/86597894
+
+
+快速傅里叶变换 讲解
+https://blog.csdn.net/enjoy_pascal/article/details/81478582
+
+
+matlab 一维离散傅里叶变换的使用说明
+https://www.jianshu.com/p/217c4d4094c5
+
+
+matlab教程
+http://c.biancheng.net/view/6595.html
+
+
+fftshift意义
+https://blog.csdn.net/haoaoweitt/article/details/83012477
+
+Lena/Lenna 图片下载
+https://www.ece.rice.edu/~wakin/images/
+
+DFT与IDFT 实现
+https://blog.csdn.net/mingzhuo_126/article/details/88044390
+
+
