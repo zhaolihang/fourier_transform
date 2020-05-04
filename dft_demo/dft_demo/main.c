@@ -1,7 +1,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>			 
+#include <math.h>
+#include <memory.h>
 #define PI	3.1415926535
 
 
@@ -10,39 +11,7 @@ typedef struct				//复数结构体,用于实现傅里叶运算
 	double real, image;
 } complex;
 
-
-typedef struct
-{
-	int array_count;
-	double* array;
-	int f_count;
-	complex* f_array_result;
-	complex* idft_array;
-} context;
-
-context init_context(int array_count, int f_count) {
-	context c;
-	c.array_count = array_count;
-	c.f_count = f_count;
-	c.array = (double*)malloc(sizeof(double) * array_count);
-	c.f_array_result = (complex*)malloc(sizeof(complex) * f_count);
-	c.idft_array = (complex*)malloc(sizeof(complex) * array_count);
-	return c;
-}
-
-void free_context(context ctx) {
-	if (ctx.array != 0) {
-		free(ctx.array);
-	}
-	if (ctx.f_array_result != 0) {
-		free(ctx.f_array_result);
-	}
-	if (ctx.idft_array != 0) {
-		free(ctx.idft_array);
-	}
-}
-
-complex complex_exp_minus(int N ,int f, int n)
+complex complex_exp_minus(int N, int f, int n)
 {
 	complex result;
 	// 欧拉展开
@@ -70,6 +39,128 @@ complex complex_mul(complex a, complex b)
 	return result;
 }
 
+typedef struct
+{
+	int array_count;
+	double* array;
+	int f_count;
+	complex* f_array_result;
+	complex* idft_array;
+	complex* exp_i;
+	complex* exp_minus_i;
+} context;
+
+context init_context(int array_count, int f_count) {
+	context c;
+	c.array_count = array_count;
+	c.f_count = f_count;
+	c.array = (double*)malloc(sizeof(double) * array_count);
+	c.f_array_result = (complex*)malloc(sizeof(complex) * f_count);
+	c.idft_array = (complex*)malloc(sizeof(complex) * array_count);
+
+	c.exp_i = (complex*)malloc(sizeof(complex) * array_count);
+	c.exp_minus_i = (complex*)malloc(sizeof(complex) * f_count);
+	{
+		{
+			char* flags = malloc(sizeof(char) * array_count);
+			memset(flags, 0, sizeof(char) * array_count);
+			for (int f = 0; f < f_count; f++)
+			{
+				for (int n = 0; n < array_count; n++)
+				{
+					int real_n = f*n % array_count;
+
+					if (flags[real_n] == 0) {
+						if (array_count % 2 == 0) {
+							int half = array_count / 2;
+							if (real_n >= half) {
+								int dep_n = real_n - half;
+								if (flags[dep_n] == 1) {
+									complex result = c.exp_i[dep_n];
+									result.real = -result.real;
+									result.image = -result.image;
+									c.exp_i[real_n] = result;
+									flags[n] = 1;
+									continue;
+								}
+							}
+						}
+
+						c.exp_i[real_n] = complex_exp(array_count, 1, real_n);
+						flags[n] = 1;
+					}
+				}
+			}
+			free(flags);
+		}
+		{
+			char* flags = malloc(sizeof(char) * f_count);
+			memset(flags, 0, sizeof(char) * f_count);
+			for (int f = 0; f < f_count; f++)
+			{
+				for (int n = 0; n < array_count; n++)
+				{
+					int real_n = f*n % f_count;
+
+					if (f_count % 2 == 0) {
+						int half = f_count / 2;
+						if (real_n >= half) {
+							int dep_n = real_n - half;
+							if (flags[dep_n] == 1) {
+								complex result = c.exp_minus_i[dep_n];
+								result.real = -result.real;
+								result.image = -result.image;
+								c.exp_minus_i[real_n] = result;
+								flags[n] = 1;
+								continue;
+							}
+						}
+					}
+
+					if (flags[real_n] == 0) {
+						c.exp_minus_i[real_n] = complex_exp_minus(f_count, 1, real_n);
+						flags[n] = 1;
+					}
+				}
+			}
+			free(flags);
+		}
+	}
+	return c;
+}
+
+void free_context(context ctx) {
+	if (ctx.array != 0) {
+		free(ctx.array);
+	}
+	if (ctx.f_array_result != 0) {
+		free(ctx.f_array_result);
+	}
+	if (ctx.idft_array != 0) {
+		free(ctx.idft_array);
+	}
+	if (ctx.exp_i != 0) {
+		free(ctx.exp_i);
+	}
+	if (ctx.exp_minus_i != 0) {
+		free(ctx.exp_minus_i);
+	}
+}
+
+complex get_complex_exp_minus(context ctx, int f, int n)
+{
+	int real_n = f*n % ctx.f_count;
+	complex result = ctx.exp_minus_i[real_n];
+	return result;
+}
+
+complex get_complex_exp(context ctx, int f, int n)
+{
+	int real_n = f*n % ctx.array_count;
+	complex result = ctx.exp_i[real_n];
+	return result;
+}
+
 complex dft_calculate_f(context ctx,int f)
 {
 	complex sum;
@@ -77,7 +168,7 @@ complex dft_calculate_f(context ctx,int f)
 	sum.image = 0;
 	for (int n = 0; n<ctx.array_count; n++)
 	{
-		complex result = complex_exp_minus(ctx.f_count, f, n);
+		complex result = get_complex_exp_minus(ctx, f, n);
 		double origin = ctx.array[n];
 		sum.real += origin * result.real;
 		sum.image += origin * result.image;
@@ -111,7 +202,7 @@ complex idft_calculate_point(context ctx,int n) {
 	for (int f = 0; f<ctx.f_count; f++)
 	{
 		complex f_result = ctx.f_array_result[f];
-		complex complex_ft = complex_exp(ctx.array_count, f, n);
+		complex complex_ft = get_complex_exp(ctx, f, n);
 		complex p_result_tmp = complex_mul(f_result, complex_ft);
 		p_result.real += p_result_tmp.real;
 		p_result.image += p_result_tmp.image;
